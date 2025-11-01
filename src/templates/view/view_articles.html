@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}文章列表{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto p-4">
+    <h1 class="text-3xl font-bold mb-4">文章列表</h1>
+
+    <div id="articles-list" class="space-y-4">
+        <!-- 文章列表会被 JS 动态填充 -->
+    </div>
+
+    <div class="flex justify-between items-center mt-6">
+        <button id="prev-btn" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300" disabled>上一页</button>
+        <span id="page-info" class="text-gray-600"></span>
+        <button id="next-btn" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300" disabled>下一页</button>
+    </div>
+</div>
+
+<script>
+let currentPage = 1;
+let totalPages = 1;
+const pageSize = 10;
+
+async function fetchArticles(page=1) {
+    try {
+        const res = await fetch(`/api/articles?page=${page}&page_size=${pageSize}`);
+        if (!res.ok) throw new Error("Failed to fetch articles");
+        const data = await res.json();
+
+        currentPage = data.page;
+        totalPages = data.total_pages;
+
+        const listContainer = document.getElementById("articles-list");
+        listContainer.innerHTML = "";
+
+        if (data.items.length === 0) {
+            listContainer.innerHTML = `<p class="text-gray-500">暂无文章</p>`;
+        } else {
+            data.items.forEach(article => {
+                const item = document.createElement("div");
+                item.className = "p-4 border rounded hover:shadow cursor-pointer transition";
+                item.innerHTML = `
+                    <a href="/view/${article.id}" class="block text-lg font-semibold text-blue-600 hover:underline">
+                        ${article.title}
+                    </a>
+                    <p class="text-gray-500 text-sm mt-1">${article.date}</p>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        // 更新分页按钮状态
+        document.getElementById("prev-btn").disabled = currentPage <= 1;
+        document.getElementById("next-btn").disabled = currentPage >= totalPages;
+        document.getElementById("page-info").textContent = `第 ${currentPage} 页，共 ${totalPages} 页`;
+    } catch (err) {
+        console.error(err);
+        document.getElementById("articles-list").innerHTML = `<p class="text-red-500">加载文章失败</p>`;
+    }
+}
+
+// 分页按钮事件
+document.getElementById("prev-btn").addEventListener("click", () => {
+    if (currentPage > 1) fetchArticles(currentPage - 1);
+});
+document.getElementById("next-btn").addEventListener("click", () => {
+    if (currentPage < totalPages) fetchArticles(currentPage + 1);
+});
+
+// 页面初次加载
+fetchArticles();
+</script>
+{% endblock %}

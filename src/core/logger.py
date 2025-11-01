@@ -74,6 +74,6 @@ sse_handler = SSELoggingHandler()
 
 logging.basicConfig(
     level=logging.INFO,
-    format='[%(asctime)s] %(levelname)s: %(message)s',
+    format="[%(asctime)s] %(levelname)s: %(message)s",
     handlers=[logging.StreamHandler(), sse_handler]
 )

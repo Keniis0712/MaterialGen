@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown-light.css">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<div class="max-w-3xl mx-auto p-4">
+    <!-- Markdown 容器 -->
+    <div id="markdown-content" class="markdown-body"></div>
+
+    <div class="mt-6">
+        <a href="/view" class="text-blue-600 hover:underline">&larr; 返回文章列表</a>
+    </div>
+</div>
+
+<script>
+const rawMarkdown = `{{ content | safe | replace('\n', '\\n') | replace('`', '\\`') }}`;
+document.getElementById('markdown-content').innerHTML = marked.parse(rawMarkdown);
+</script>
+{% endblock %}

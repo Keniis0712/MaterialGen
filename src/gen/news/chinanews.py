@@ -30,7 +30,7 @@ async def parse(url: str) -> Optional[Article]:
         title=title_tag.get_text(strip=True) if title_tag else "",
         text=content_tag.get_text(strip=True) if content_tag else "",
         image_counts=image_counts,
-        source=source_tag.get_text(strip=True).rsplit('：', 1)[1] if source_tag else "",
+        source=source_tag.get_text(strip=True).rsplit("：", 1)[1] if source_tag else "",
         link=url,
         pub_date=pubtime_tag.get_text(strip=True) if pubtime_tag else "",
     )

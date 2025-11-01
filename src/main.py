@@ -32,10 +32,11 @@ app = FastAPI(
 
 app.include_router(routers.pages.index.router)
 app.include_router(routers.pages.user.router)
-app.include_router(routers.pages.view.router)
-app.include_router(routers.apis.article.router, prefix='/api/articles')
-app.include_router(routers.apis.generator.router, prefix='/api/generator')
-app.include_router(routers.apis.user.router, prefix='/api/users')
+app.include_router(routers.pages.view.router, prefix="/view")
+app.include_router(routers.apis.article.router, prefix="/api/articles")
+app.include_router(routers.apis.generator.router, prefix="/api/generator")
+app.include_router(routers.apis.user.router, prefix="/api/users")
 
 app.add_exception_handler(Exception, exceptions.internal_exception_handler)
+# noinspection PyTypeChecker
 app.add_exception_handler(HTTPException, exceptions.http_exception_handler)
