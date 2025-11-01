@@ -49,9 +49,9 @@ def get_current_user_by_default(token: Optional[str] = Cookie(None)):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         role: str = payload.get("role")
-        if not username or not role or not role.isnumeric():
+        if not username or not role:
             return None
-        return {"username": username, "role": int(role)}
+        return {"username": username, "role": role}
     except JWTError:
         return None
 

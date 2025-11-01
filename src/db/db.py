@@ -35,7 +35,7 @@ async def init_db():
             new_admin = User(
                 username="admin",
                 password=hash_password("THEPassword"),
-                role=UserRole.Admin
+                role=UserRole.Admin.value
             )
             session.add(new_admin)
             await session.commit()

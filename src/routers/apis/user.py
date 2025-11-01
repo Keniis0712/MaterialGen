@@ -79,7 +79,7 @@ async def delete_user(
     return {"message": "User deleted successfully"}
 
 
-@router.put("/{username}/password")
+@router.put("/{username}")
 async def update_password(
     username: str,
     data: dict,
