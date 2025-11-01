@@ -29,6 +29,6 @@ async def index(request: Request, token: Optional[str] = Cookie(None)):
 @router.get("/admin", response_class=HTMLResponse)
 async def admin(
         request: Request,
-        current_user: dict = Depends(require_role(UserRole.Admin))
+        user_obj: dict = Depends(require_role(UserRole.Admin))
 ):
-    return templates.TemplateResponse("admin.html", {"request": request})
+    return templates.TemplateResponse("admin.html", {"request": request, "user": user_obj})

@@ -23,7 +23,7 @@ async def read_index(
         start_date: str = Query(None),
         end_date: str = Query(None),
         database: AsyncSession = Depends(db.db),
-        current_user: dict = Depends(require_role(UserRole.User))
+        _: dict = Depends(require_role(UserRole.User))
 ):
     # 构建查询
     stmt = select(Markdown)
@@ -64,7 +64,7 @@ async def view_markdown(
         request: Request,
         md_id: str,
         database: AsyncSession = Depends(db.db),
-        current_user: dict = Depends(require_role(UserRole.User))
+        _: dict = Depends(require_role(UserRole.User))
 ):
     # noinspection PyTypeChecker
     stmt = select(Markdown).where(Markdown.id == md_id)
