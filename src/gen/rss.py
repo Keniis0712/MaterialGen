@@ -1,10 +1,13 @@
 import asyncio
 import aiohttp
-import feedparser
 from collections import deque
 from typing import AsyncGenerator, Deque, TypedDict
+import logging
 
+import feedparser
 from feedparser import FeedParserDict
+
+logger = logging.getLogger(__name__)
 
 
 RSSResult = TypedDict(
@@ -21,18 +24,16 @@ RSSResult = TypedDict(
 
 async def fetch_feed_text(session: aiohttp.ClientSession, url: str, headers: dict[str, str] = None):
     async with session.get(url, headers=headers) as resp:
-        if resp.status == 304:
-            # 无更新
-            return None, resp.headers
         resp.raise_for_status()
         text = await resp.text()
-        return text, resp.headers
+        return text
 
 
 async def fetch_updates_from_source(
     rss_url: str,
     interval: float = 60.0,
-    session: aiohttp.ClientSession = None
+    session: aiohttp.ClientSession = None,
+    ignore_first: bool = False,
 ) -> AsyncGenerator[RSSResult, None]:
     """
     单个 RSS 源的异步生成器：周期性拉取，yield 新条目。
@@ -46,30 +47,14 @@ async def fetch_updates_from_source(
     seen_set: set[str] = set()
     max_seen = None
 
-    etag = None
-    modified = None
-
     try:
         while True:
-            headers = {}
-            if etag:
-                headers["If-None-Match"] = etag
-            if modified:
-                headers["If-Modified-Since"] = modified
-
             try:
-                result = await fetch_feed_text(session, rss_url, headers=headers)
-                if result is None:
-                    await asyncio.sleep(interval)
-                    continue
-                text, resp_headers = result
+                text = await fetch_feed_text(session, rss_url)
             except aiohttp.ClientError as e:
-                print(f"[{rss_url}] fetch error: {e}")
+                logger.error(f"[{rss_url}] fetch error: {e}")
                 await asyncio.sleep(interval)
                 continue
-
-            etag = resp_headers.get("ETag") or etag
-            modified = resp_headers.get("Last-Modified") or modified
 
             entries = feedparser.parse(text).entries
             if max_seen is None:
@@ -94,8 +79,9 @@ async def fetch_updates_from_source(
                     "published": entry.get("published"),
                     "entry": entry,
                 }
-                yield ret
-
+                if not ignore_first:
+                    yield ret
+            ignore_first = False
             await asyncio.sleep(interval)
     finally:
         if own_session:
@@ -104,14 +90,15 @@ async def fetch_updates_from_source(
 
 async def fetch_updates_multi(
     rss_urls: list[str],
-    interval: float = 60.0
+    interval: float = 60.0,
+    ignore_first: bool = False,
 ) -> AsyncGenerator[RSSResult, None]:
     async with aiohttp.ClientSession() as session:
         tasks = []
         queue = asyncio.Queue()
 
         async def collect_updates(fetch_url: str):
-            async for fetch_item in fetch_updates_from_source(fetch_url, interval, session):
+            async for fetch_item in fetch_updates_from_source(fetch_url, interval, session, ignore_first):
                 await queue.put(fetch_item)
 
         for url in rss_urls:
@@ -126,16 +113,3 @@ async def fetch_updates_multi(
             for task in tasks:
                 task.cancel()
             await asyncio.gather(*tasks, return_exceptions=True)
-
-
-# === 示例使用 ===
-async def main():
-    rss_urls = [
-        "https://www.chinanews.com.cn/rss/scroll-news.xml",
-    ]
-    async for item in fetch_updates_multi(rss_urls, interval=5):
-        print(f"[{item['feed_url']}] {item['title']} -> {item['link']}")
-
-
-if __name__ == "__main__":
-    asyncio.run(main())

@@ -1,3 +1,4 @@
-src/data
+data
 .idea
 .venv
+src/run.ps1

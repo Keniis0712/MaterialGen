@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}页面未找到{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[calc(100vh-8rem)]">
+    <div class="bg-white p-12 rounded-2xl shadow-xl text-center max-w-md w-full">
+        <h1 class="text-6xl font-bold text-gray-400 mb-4">404</h1>
+        <p class="text-gray-600 mb-6">页面未找到：<span class="font-mono">{{ path }}</span></p>
+        <a href="/" class="inline-block px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+            返回首页
+        </a>
+    </div>
+</div>
+{% endblock %}

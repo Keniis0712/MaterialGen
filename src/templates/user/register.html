@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}注册{% endblock %}
+
+{% block content %}
+<div class="flex justify-center items-center py-10">
+    <div class="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
+        <h2 class="text-2xl font-bold text-center mb-6">注册新用户</h2>
+
+        {% if error %}
+            <p class="text-red-500 text-center mb-4">{{ error }}</p>
+        {% endif %}
+        {% if success %}
+            <p class="text-green-500 text-center mb-4">{{ success }}</p>
+        {% endif %}
+
+        <form method="post" onsubmit="return validateForm()" class="space-y-4" novalidate>
+            <div>
+                <label class="block text-sm font-medium mb-1" for="username">用户名</label>
+                <input id="username" name="username" type="text" placeholder="3-15位字母或数字"
+                    required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <p id="username-error" class="text-red-500 text-sm mt-1 hidden"></p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1" for="password">密码</label>
+                <input id="password" name="password" type="password" placeholder="8-20位，含字母和数字"
+                    required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <p id="password-error" class="text-red-500 text-sm mt-1 hidden"></p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1" for="confirm_password">确认密码</label>
+                <input id="confirm_password" name="confirm_password" type="password" placeholder="再次输入密码"
+                    required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <p id="confirm-error" class="text-red-500 text-sm mt-1 hidden"></p>
+            </div>
+
+            <button type="submit"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-md transition">
+                注册
+            </button>
+        </form>
+
+        <p class="text-center mt-4">
+            <a href="/login" class="text-blue-600 hover:underline">返回登录</a>
+        </p>
+    </div>
+</div>
+
+<script>
+function validateForm() {
+    const username = document.getElementById("username");
+    const password = document.getElementById("password");
+    const confirm = document.getElementById("confirm_password");
+
+    const usernameError = document.getElementById("username-error");
+    const passwordError = document.getElementById("password-error");
+    const confirmError = document.getElementById("confirm-error");
+
+    // 清空旧错误
+    usernameError.classList.add("hidden");
+    passwordError.classList.add("hidden");
+    confirmError.classList.add("hidden");
+
+    let valid = true;
+
+    const usernameRegex = /^[A-Za-z0-9]{3,15}$/;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]{8,20}$/;
+
+    if (!usernameRegex.test(username.value.trim())) {
+        usernameError.textContent = "用户名必须是3-15位字母或数字。";
+        usernameError.classList.remove("hidden");
+        valid = false;
+    }
+
+    if (!passwordRegex.test(password.value)) {
+        passwordError.textContent = "密码需为8-20位，包含至少一个字母和一个数字。";
+        passwordError.classList.remove("hidden");
+        valid = false;
+    }
+
+    if (password.value !== confirm.value) {
+        confirmError.textContent = "两次输入的密码不一致。";
+        confirmError.classList.remove("hidden");
+        valid = false;
+    }
+
+    return valid;
+}
+</script>
+{% endblock %}

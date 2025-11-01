@@ -35,22 +35,3 @@ async def parse(url: str) -> Optional[Article]:
         pub_date=pubtime_tag.get_text(strip=True) if pubtime_tag else "",
     )
     return article
-
-
-async def main():
-    url = "https://www.chinanews.com.cn/edu/2025/10-26/10504633.shtml"
-    article = await parse(url)
-    if article:
-        print(article.source)
-        print(article.title)
-        print(article.pub_date)
-        print(article.link)
-        print(article.text[:50])
-    else:
-        print("Failed to fetch article")
-
-
-if __name__ == "__main__":
-    import asyncio
-
-    asyncio.run(main())
