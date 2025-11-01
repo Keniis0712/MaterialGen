@@ -5,7 +5,8 @@ import logging
 
 from sqlalchemy import String, insert
 
-from db import AsyncSessionLocal, Markdown, files_path
+from db.db import AsyncSessionLocal, files_path
+from db.models import Markdown
 from .llm_parse import LLMOutputs
 from .news.common import Article
 

@@ -8,11 +8,8 @@ from passlib.context import CryptContext
 
 from fastapi.security import OAuth2PasswordBearer
 
-from db import UserRole
-
-SECRET_KEY = "supersecretkey"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+from config import *
+from db.models import UserRole
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
