@@ -4,7 +4,6 @@ from fastapi import FastAPI
 from starlette.exceptions import HTTPException
 
 from db import db
-from gen.rss import fetch_updates_multi
 from gen import news
 import routers
 from handlers import exceptions
